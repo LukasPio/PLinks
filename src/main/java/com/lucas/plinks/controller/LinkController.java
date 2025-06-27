@@ -1,10 +1,10 @@
 package com.lucas.plinks.controller;
 
+import com.lucas.plinks.DTO.CustomLinkRequestDTO;
 import com.lucas.plinks.DTO.LinkRequestDTO;
 import com.lucas.plinks.service.LinkService;
 import com.lucas.plinks.utils.ApiResponse;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -35,6 +35,20 @@ public class LinkController {
                 elapsed + " ms"
         );
 
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @PostMapping("/short/custom")
+    public ResponseEntity<ApiResponse<String>> customLink(@RequestBody CustomLinkRequestDTO linkDTO) {
+        long start = System.currentTimeMillis();
+        String shortenedLink = linkService.shortLinkWithCustomSlug(linkDTO);
+        long elapsed = System.currentTimeMillis() - start;
+        ApiResponse<String> response = new ApiResponse<>(
+                HttpStatus.OK.toString(),
+                "link was successgully shortened with custom slug",
+                shortenedLink,
+                elapsed + " ms"
+        );
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
