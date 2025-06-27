@@ -1,7 +1,9 @@
 package com.lucas.plinks.service;
 
+import com.lucas.plinks.DTO.CustomLinkRequestDTO;
 import com.lucas.plinks.DTO.LinkRequestDTO;
 import com.lucas.plinks.exception.InvalidUrlException;
+import com.lucas.plinks.exception.SlugAlreadyRegisteredException;
 import com.lucas.plinks.utils.PlinksProperties;
 import com.lucas.plinks.utils.SlugGenerator;
 import com.lucas.plinks.domain.LinkModel;
@@ -53,5 +55,15 @@ public class LinkService {
         linkRepository.save(link);
 
         return link.getOriginalUrl();
+    }
+
+    public String shortLinkWithCustomSlug(CustomLinkRequestDTO linkDTO) {
+        String slug = linkDTO.slug();
+        Optional<LinkModel> originalLink = linkRepository.findBySlug(slug);
+        if (originalLink.isPresent()) throw new SlugAlreadyRegisteredException();
+        LinkModel link = new LinkModel(null, slug, linkDTO.url(), 0, new Timestamp(System.currentTimeMillis()));
+        linkRepository.save(link);
+
+        return plinksProperties.getDomain() + "/" + slug;
     }
 }
