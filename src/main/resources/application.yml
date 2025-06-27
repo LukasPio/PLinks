@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: plinks
+  datasource:
+    url: jdbc:postgresql://localhost:5432/Plinks
+    username: postgres
+    password: JsL9k7IDKw%b#m$7RrT0
+  flyway:
+    locations: classpath:db/migration
+plink:
+  domain: http://localhost:8080
+server:
+  port: 8080

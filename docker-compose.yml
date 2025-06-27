@@ -1,0 +1,9 @@
+services:
+  db:
+    container_name: database
+    image: postgres:16.9-bullseye
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: JsL9k7IDKw%b#m$7RrT0
+      POSTGRES_DB: Plinks
