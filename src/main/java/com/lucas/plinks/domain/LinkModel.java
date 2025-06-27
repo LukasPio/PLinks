@@ -1,4 +1,4 @@
-package com.lucas.plinks;
+package com.lucas.plinks.domain;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
