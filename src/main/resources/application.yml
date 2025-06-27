@@ -11,3 +11,6 @@ plink:
   domain: http://localhost:8080
 server:
   port: 8080
+  error:
+    whitelabel:
+      enabled: false
