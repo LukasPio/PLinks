@@ -17,7 +17,7 @@ import java.sql.Timestamp;
 public class LinkModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
     private String slug;
     @Column(name = "original_url")
     private String originalUrl;
