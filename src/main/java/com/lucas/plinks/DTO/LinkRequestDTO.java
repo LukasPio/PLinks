@@ -1,4 +1,4 @@
-package com.lucas.plinks;
+package com.lucas.plinks.DTO;
 
 public record LinkRequestDTO(String url) {
 }
