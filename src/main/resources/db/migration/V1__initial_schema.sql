@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS links (
     id SERIAL PRIMARY KEY,
     slug VARCHAR(20) UNIQUE NOT NULL,
-    original_url TEXT,
+    original_url TEXT NOT NULL ,
+    clicks INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
