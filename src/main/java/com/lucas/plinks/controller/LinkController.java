@@ -1,6 +1,5 @@
 package com.lucas.plinks.controller;
 
-import com.lucas.plinks.DTO.CustomLinkRequestDTO;
 import com.lucas.plinks.DTO.LinkRequestDTO;
 import com.lucas.plinks.service.LinkService;
 import com.lucas.plinks.utils.ApiResponse;
@@ -24,7 +23,9 @@ public class LinkController {
     @PostMapping("/short")
     public ResponseEntity<ApiResponse<String>> shortLink(@RequestBody LinkRequestDTO linkDTO) {
         long start = System.currentTimeMillis();
-        String shortenedLink = linkService.shortLink(linkDTO);
+        String shortenedLink;
+
+        shortenedLink = linkService.shortLink(linkDTO);
 
         long elapsed = System.currentTimeMillis() - start;
 
@@ -35,20 +36,6 @@ public class LinkController {
                 elapsed + " ms"
         );
 
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
-
-    @PostMapping("/short/custom")
-    public ResponseEntity<ApiResponse<String>> customLink(@RequestBody CustomLinkRequestDTO linkDTO) {
-        long start = System.currentTimeMillis();
-        String shortenedLink = linkService.shortLinkWithCustomSlug(linkDTO);
-        long elapsed = System.currentTimeMillis() - start;
-        ApiResponse<String> response = new ApiResponse<>(
-                HttpStatus.OK.toString(),
-                "link was successgully shortened with custom slug",
-                shortenedLink,
-                elapsed + " ms"
-        );
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

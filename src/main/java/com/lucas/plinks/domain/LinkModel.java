@@ -24,4 +24,5 @@ public class LinkModel {
     private int clicks;
     @Column(name = "created_at")
     private Timestamp createdAt;
+    private String password;
 }

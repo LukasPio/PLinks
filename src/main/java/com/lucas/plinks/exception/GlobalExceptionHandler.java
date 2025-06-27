@@ -29,4 +29,24 @@ public class GlobalExceptionHandler {
         );
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
+    @ExceptionHandler(SlugAlreadyRegisteredException.class)
+    public ResponseEntity<ApiResponse<Void>> handleSlugAlreadyRegisteredException(SlugAlreadyRegisteredException ex) {
+        ApiResponse<Void> response = new ApiResponse<>(
+                HttpStatus.CONFLICT.toString(),
+                "slug already was registered",
+                null,
+                null
+        );
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    }
+    @ExceptionHandler(InvalidPasswordException.class)
+    public ResponseEntity<ApiResponse<Void>> handleInvalidPasswordException(InvalidPasswordException ex) {
+        ApiResponse<Void> response = new ApiResponse<>(
+                HttpStatus.UNAUTHORIZED.toString(),
+                "invalid password",
+                null,
+                null
+        );
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+    }
 }
