@@ -1,4 +1,4 @@
-package com.lucas.plinks;
+package com.lucas.plinks.utils;
 
 import lombok.Getter;
 import lombok.Setter;
