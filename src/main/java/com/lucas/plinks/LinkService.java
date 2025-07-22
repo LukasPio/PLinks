@@ -67,4 +67,11 @@ public class LinkService {
             return true;
         }
     }
+
+
+    public int getClicksFromShortenedLink(SlugRequestDTO slug) {
+        Optional<Link> link = linkRepository.findBySlug(slug.slug().replace(" ", ""));
+        if (link.isEmpty()) throw new SlugNotFoundException();
+        return link.get().clicks;
+    }
 }
