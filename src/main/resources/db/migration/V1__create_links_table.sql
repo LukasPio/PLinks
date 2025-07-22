@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS links (
+    id SERIAL PRIMARY KEY,
+    url TEXT NOT NULL ,
+    slug TEXT NOT NULL,
+    clicks INT DEFAULT 0
+)
