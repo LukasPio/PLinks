@@ -29,10 +29,6 @@ public class LinkController {
     }
 
     @GetMapping("/{slug}")
-    public String redirect(@PathVariable String slug) {
-        String url = linkService.getUrlFromSlug(slug);
-        if (url == null) return "Not found";
-        return "redirect:" + url;
     public ResponseEntity<Void> redirect(@PathVariable String slug) throws URISyntaxException {
         String url = linkService.redirect(slug);
         if (url == null) {
@@ -41,5 +37,14 @@ public class LinkController {
         }
         return ResponseEntity.status(HttpStatus.FOUND).location(new URI(url)).build();
     }
+
+    @PostMapping("/clicks")
+    public ResponseEntity<ApiResponse<Integer>> clicks(@RequestBody SlugRequestDTO slug) {
+        int clicks = linkService.getClicksFromShortenedLink(slug);
+        ApiResponse<Integer> response = new ApiResponse<>(
+                "Successfully got clicks from link",
+                new Timestamp(System.currentTimeMillis()),
+                HttpStatus.OK.value(), clicks);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }
