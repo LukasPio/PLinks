@@ -14,8 +14,22 @@ public class LinkService {
         this.linkRepository = linkRepository;
     }
 
-    public String shortUrl(String url) {
-        String slug = getRandomAndUniqueSlug(url);
+    public String shortUrl(LinkRequestDTO requestDTO) {
+        if (!requestDTO.url().startsWith("https://") || isInvalidLink(requestDTO.url()))
+            throw new InvalidLinkException();
+
+        String slug;
+        if (requestDTO.slug() != null) {
+            slug = requestDTO.slug().replace(" ", "");
+            if (linkRepository.existsBySlug(slug)) throw new SlugAlreadyExistsException();
+        } else {
+            slug = getRandomAndUniqueSlug();
+        }
+
+        Link link = new Link(null, requestDTO.url(), slug, 0);
+
+        linkRepository.save(link);
+
         return Constants.BASE_URL + "/" + slug;
     }
 
