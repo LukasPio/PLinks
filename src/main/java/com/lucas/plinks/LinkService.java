@@ -34,8 +34,14 @@ public class LinkService {
         return  randomSlug.toString();
     }
 
-    public String getUrlFromSlug(String slug) {
+
+    public String redirect(String slug) {
         Optional<Link> link = linkRepository.findBySlug(slug);
+        if (link.isPresent()) {
+            Link toUpdate = link.get();
+            toUpdate.clicks = toUpdate.clicks + 1;
+            linkRepository.save(toUpdate);
+        }
         return link.map(value -> value.url).orElse(null);
     }
 }
