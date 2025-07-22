@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: PLinks
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    username: postgres
+    password: secret123
+    url: jdbc:postgresql://localhost:5432/Plinks
