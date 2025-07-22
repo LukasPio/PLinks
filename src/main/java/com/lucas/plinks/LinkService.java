@@ -1,7 +1,12 @@
 package com.lucas.plinks;
 
+import com.lucas.plinks.exception.InvalidLinkException;
+import com.lucas.plinks.exception.SlugAlreadyExistsException;
+import com.lucas.plinks.exception.SlugNotFoundException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.net.URL;
 import java.util.Optional;
 import java.util.Random;
 
@@ -33,19 +38,21 @@ public class LinkService {
         return Constants.BASE_URL + "/" + slug;
     }
 
-    private String getRandomAndUniqueSlug(String url) {
-        StringBuilder randomSlug = new StringBuilder();
+    private String getRandomAndUniqueSlug() {
         String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        boolean exists = false;
+        String slug;
+
         do {
+            StringBuilder randomSlug = new StringBuilder();
             Random random = new Random();
             for (int i = 0; i < Constants.SLUG_MAX_SIZE; i++) {
                 char randomChar = chars.charAt(random.nextInt(chars.length()));
                 randomSlug.append(randomChar);
             }
-            if (linkRepository.existsBySlug(randomSlug.toString())) exists = true;
-        } while (exists);
-        return  randomSlug.toString();
+            slug = randomSlug.toString();
+        } while (linkRepository.existsBySlug(slug));
+
+        return slug;
     }
 
 
