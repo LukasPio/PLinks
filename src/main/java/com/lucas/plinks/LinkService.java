@@ -58,4 +58,13 @@ public class LinkService {
         }
         return link.map(value -> value.url).orElse(null);
     }
+
+    private boolean isInvalidLink(String link) {
+        try {
+            new URL(link);
+            return false;
+        } catch (Exception e) {
+            return true;
+        }
+    }
 }
