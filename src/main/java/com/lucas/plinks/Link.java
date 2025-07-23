@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "links")
 @AllArgsConstructor
@@ -14,5 +16,7 @@ public class Link {
     Long id;
     String url;
     String slug;
+    @Column(name = "expires_at")
+    LocalDateTime expiresAt;
     int clicks;
 }

@@ -1,12 +1,15 @@
 package com.lucas.plinks;
 
 import com.lucas.plinks.exception.InvalidLinkException;
+import com.lucas.plinks.exception.LinkAlreadyExpiresException;
 import com.lucas.plinks.exception.SlugAlreadyExistsException;
 import com.lucas.plinks.exception.SlugNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.net.URL;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Random;
 
@@ -24,14 +27,17 @@ public class LinkService {
             throw new InvalidLinkException();
 
         String slug;
-        if (requestDTO.slug() != null) {
+
+        if (requestDTO.slug() == null) {
+            slug = getRandomAndUniqueSlug();
+        } else {
             slug = requestDTO.slug().replace(" ", "");
             if (linkRepository.existsBySlug(slug)) throw new SlugAlreadyExistsException();
-        } else {
-            slug = getRandomAndUniqueSlug();
         }
 
-        Link link = new Link(null, requestDTO.url(), slug, 0);
+        LocalDateTime expiresAt = requestDTO.expiresAfter() != null ? LocalDateTime.now().plusSeconds(requestDTO.expiresAfter()) : null;
+
+        Link link = new Link(null, requestDTO.url(), slug, expiresAt,0);
 
         linkRepository.save(link);
 
@@ -51,19 +57,21 @@ public class LinkService {
             }
             slug = randomSlug.toString();
         } while (linkRepository.existsBySlug(slug));
-
         return slug;
     }
 
-
     public String redirect(String slug) {
-        Optional<Link> link = linkRepository.findBySlug(slug);
-        if (link.isPresent()) {
-            Link toUpdate = link.get();
-            toUpdate.clicks = toUpdate.clicks + 1;
-            linkRepository.save(toUpdate);
-        }
-        return link.map(value -> value.url).orElse(null);
+        Optional<Link> optionalLink = linkRepository.findBySlug(slug);
+
+        if (optionalLink.isEmpty())
+            throw new SlugNotFoundException();
+
+        Link link = optionalLink.get();
+
+        if (link.expiresAt != null && link.expiresAt.isBefore(LocalDateTime.now()))
+            throw new LinkAlreadyExpiresException(link.expiresAt);
+
+        return link.url;
     }
 
     private boolean isInvalidLink(String link) {
@@ -74,7 +82,6 @@ public class LinkService {
             return true;
         }
     }
-
 
     public int getClicksFromShortenedLink(SlugRequestDTO slug) {
         Optional<Link> link = linkRepository.findBySlug(slug.slug().replace(" ", ""));

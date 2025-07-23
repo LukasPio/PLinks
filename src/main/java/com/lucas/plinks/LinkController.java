@@ -29,11 +29,16 @@ public class LinkController {
     }
 
     @GetMapping("/{slug}")
-    public ResponseEntity<Void> redirect(@PathVariable String slug) throws URISyntaxException {
+    public ResponseEntity<ApiResponse<String>> redirect(@PathVariable String slug) throws URISyntaxException {
         String url = linkService.redirect(slug);
         if (url == null) {
-            URI notFound = new URI(Constants.BASE_URL + "/not-found");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).location(notFound).build();
+            ApiResponse<String> response = new ApiResponse<>(
+                    "Slug was not found",
+                    new Timestamp(System.currentTimeMillis()),
+                    404,
+                    null
+            );
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
         return ResponseEntity.status(HttpStatus.FOUND).location(new URI(url)).build();
     }
