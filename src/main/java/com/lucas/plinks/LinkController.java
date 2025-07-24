@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.Timestamp;
@@ -19,9 +20,9 @@ public class LinkController {
     }
 
     @PostMapping("/short")
-    public ResponseEntity<ApiResponse<String>> shortUrl(@RequestBody LinkRequestDTO requestDTO) {
-        String shortenedLink = linkService.shortUrl(requestDTO);
-        ApiResponse<String> response = new ApiResponse<>("Link shortened successfully", new Timestamp(
+    public ResponseEntity<ApiResponse<LinkResponseDTO>> shortUrl(@RequestBody LinkRequestDTO requestDTO) throws IOException {
+        LinkResponseDTO shortenedLink = linkService.shortUrl(requestDTO);
+        ApiResponse<LinkResponseDTO> response = new ApiResponse<>("Link shortened successfully", new Timestamp(
                 System.currentTimeMillis()),
                 HttpStatus.OK.value(),
                 shortenedLink);

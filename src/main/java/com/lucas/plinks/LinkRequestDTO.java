@@ -2,5 +2,5 @@ package com.lucas.plinks;
 
 import jakarta.annotation.Nullable;
 
-public record LinkRequestDTO(String url, @Nullable String slug, @Nullable Integer expiresAfter) {
+public record LinkRequestDTO(String url, @Nullable String slug, @Nullable Integer expiresAfter, @Nullable Boolean generateQrCode) {
 }
