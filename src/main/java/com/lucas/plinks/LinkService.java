@@ -87,8 +87,8 @@ public class LinkService {
 
     private boolean isInvalidLink(String link) {
         try {
-            new URL(link);
-            return false;
+            URL url = new URL(link);
+            return url.getHost() == null || url.getHost().isEmpty();
         } catch (Exception e) {
             return true;
         }
