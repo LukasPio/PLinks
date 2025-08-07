@@ -11,6 +11,7 @@ import java.sql.Timestamp;
 
 @RestController
 @RequestMapping("/")
+@CrossOrigin(origins = "*")
 public class LinkController {
 
     private final LinkService linkService;
