@@ -1,170 +1,206 @@
-# 🔗 PLinks — URL Shortener API
+# LpTasks API
 
-A URL shortener built with **Java 21 + Spring Boot 3**, featuring custom slugs, expiration time, click tracking, and automatic QR Code generation.
-
----
-
-## Features
-
-- Shorten any valid `https://` URL with a random or custom slug
-- Optional link expiration (TTL in seconds)
-- Click counter per shortened link
-- QR Code generation (PNG, returned as `byte[]`)
-- Global exception handling with structured JSON error responses
-- Database versioning with Flyway migrations
-- PostgreSQL persistence
+REST API for task management with JWT authentication, built with **Kotlin + Spring Boot**.
 
 ---
 
-## Endpoints
+## 🛠️ Tech Stack
 
-| Method | Path        | Description                              |
-|--------|-------------|------------------------------------------|
-| POST   | `/short`    | Shorten a URL                            |
-| GET    | `/{slug}`   | Redirect to the original URL             |
-| POST   | `/clicks`   | Get the click count for a shortened link |
-
----
-
-## Request & Response Format
-
-All responses follow a standard envelope:
-
-```json
-{
-  "message": "Link shortened successfully",
-  "timestamp": "2024-01-01T00:00:00.000Z",
-  "statusCode": 200,
-  "data": { ... }
-}
-```
-
-### POST `/short`
-
-**Request body:**
-```json
-{
-  "url": "https://example.com/some/long/path",
-  "slug": "my-link",
-  "expiresAfter": 3600,
-  "generateQrCode": true
-}
-```
-
-> All fields except `url` are optional. If `slug` is omitted, a random 8-character slug is generated.
-
-**Response:**
-```json
-{
-  "message": "Link shortened successfully",
-  "timestamp": "...",
-  "statusCode": 200,
-  "data": {
-    "shortenedUrl": "http://localhost:8080/my-link",
-    "qrCode": "<bytes>"
-  }
-}
-```
-
-### POST `/clicks`
-
-**Request body:**
-```json
-{
-  "slug": "my-link"
-}
-```
+- **Kotlin** + **Spring Boot 3.3**
+- **PostgreSQL** — data persistence
+- **Redis** — caching
+- **Spring Security** + **JWT (Auth0)** — authentication and authorization
+- **Docker Compose** — local infrastructure
+- **Maven** — dependency management
 
 ---
 
-## Error Responses
+## 📋 Prerequisites
 
-| Situation                | Status |
-|--------------------------|--------|
-| Invalid or non-https URL | `400`  |
-| Slug already registered  | `400`  |
-| Slug not found           | `404`  |
-| Link expired             | `410`  |
+- Java 21+
+- Maven
+- Docker and Docker Compose
 
 ---
 
-## Getting Started
+## 🚀 Getting Started
 
-### Prerequisites
-
-- Docker + Docker Compose
-
-### Run
+**1. Start the infrastructure (database and cache):**
 
 ```bash
-docker-compose up
+docker-compose up -d
+```
+
+**2. Run the application:**
+
+```bash
+./mvnw spring-boot:run
 ```
 
 The API will be available at `http://localhost:8080`.
 
-### Configuration
+---
 
-The database connection is configured in `application.yml`. When using Docker Compose, it is set up automatically. To run locally without Docker, update the datasource settings:
+## 🔐 Authentication
 
-```yaml
-spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/Plinks
-    username: postgres
-    password: secret123
+The API uses **JWT Bearer Token**. To access protected endpoints, include the header:
+
+```
+Authorization: Bearer <your_token>
+```
+
+### Auth endpoints
+
+| Method | Endpoint | Access | Description |
+|--------|----------|--------|-------------|
+| `POST` | `/app/auth/register` | Public | Register a new user |
+| `POST` | `/app/auth/login` | Public | Login and get a token |
+
+#### Register
+```json
+POST /app/auth/register
+{
+  "email": "user@email.com",
+  "password": "password123",
+  "isAdmin": false
+}
+```
+
+#### Login
+```json
+POST /app/auth/login
+{
+  "email": "user@email.com",
+  "password": "password123"
+}
+```
+**Response:**
+```json
+{
+  "body": { "token": "eyJhbGci..." },
+  "message": "Successfully loged in",
+  "statusCode": 200
+}
 ```
 
 ---
 
-## Project Structure
+## ✅ Task Endpoints
+
+All endpoints below require authentication.
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/app/tasks` | List all tasks |
+| `GET` | `/app/tasks/id?id={id}` | Get task by ID |
+| `GET` | `/app/tasks/title?taskTitle={title}` | Get tasks by title |
+| `GET` | `/app/tasks/category?category={category}` | Filter by category |
+| `GET` | `/app/tasks/sortByPriority?sortOrder={asc\|desc}` | Sort by priority |
+| `POST` | `/app/tasks` | Create one or more tasks |
+| `PUT` | `/app/tasks/{id}` | Update a task |
+| `DELETE` | `/app/tasks/{id}` | Delete a task |
+
+### Request body (create/update)
+
+```json
+[
+  {
+    "title": "Study Kotlin",
+    "description": "Review coroutines and flows",
+    "category": "STUDY",
+    "priority": "HIGH"
+  }
+]
+```
+
+### Available categories
+
+| Value |
+|-------|
+| `WORK` |
+| `STUDY` |
+| `HOBBY` |
+| `OTHER` |
+
+### Available priorities
+
+| Value |
+|-------|
+| `LOW` |
+| `MEDIUM` |
+| `HIGH` |
+
+---
+
+## 📦 Project Structure
 
 ```
-src/
-├── main/
-│   ├── java/com/lucas/plinks/
-│   │   ├── PLinksApplication.java
-│   │   ├── Link.java                   # JPA entity
-│   │   ├── LinkController.java         # REST endpoints
-│   │   ├── LinkService.java            # Business logic + QR Code generation
-│   │   ├── LinkRepository.java         # Spring Data JPA
-│   │   ├── ApiResponse.java            # Standard response envelope
-│   │   ├── Constants.java
-│   │   ├── *DTO.java                   # Request / Response records
-│   │   └── exception/
-│   │       ├── GlobalExceptionHandler.java
-│   │       └── *.java                  # Custom exceptions
-│   └── resources/
-│       ├── application.yml
-│       └── db/migration/               # Flyway versioned migrations
+src/main/kotlin/com/lucas/lptasks/
+├── controller/       # REST layer
+├── service/          # Business logic
+├── repository/       # Database access
+├── model/            # JPA entities
+├── dto/              # Data transfer objects
+├── security/         # JWT filters and Spring Security config
+├── exception/        # Custom exceptions and global handler
+├── enum/             # Category and priority enums
+└── utils/            # Helpers (validation, ApiResponse)
 ```
 
 ---
 
-## Tech Stack
+## 🗄️ Configuration
 
-| Layer       | Technology                  |
-|-------------|-----------------------------|
-| Language    | Java 21                     |
-| Framework   | Spring Boot 3               |
-| Database    | PostgreSQL                  |
-| Migrations  | Flyway                      |
-| ORM         | Spring Data JPA / Hibernate |
-| QR Code     | nayuki/QR-Code-generator    |
-| Boilerplate | Lombok                      |
-| Infra       | Docker + Docker Compose     |
+Settings are defined in `src/main/resources/application.yml`. Default values:
 
----
+| Property | Default |
+|----------|---------|
+| `server.port` | `8080` |
+| `datasource.url` | `jdbc:postgresql://127.0.0.1:5432/LpTasks` |
+| `datasource.username` | `lukas` |
+| `datasource.password` | `mistery123` |
+| `cache.type` | `redis` |
+| `token.secret` | `encrypted123` |
 
-## Roadmap
-
-- [ ] Authentication — protect endpoints with JWT
-- [ ] Custom domains — allow using a custom base URL per user
-- [ ] Dashboard — UI to manage and visualize links and click stats
-- [ ] Rate limiting — prevent abuse on the `/short` endpoint
-- [ ] Analytics — detailed click history with timestamps and geolocation
+> ⚠️ In production, replace `token.secret` with a strong value and externalize credentials via environment variables.
 
 ---
 
-## License
+## 🐳 Docker Compose
 
-MIT
+The `docker-compose.yml` file starts two services:
+
+- **PostgreSQL 13** on port `5432` — auto-initialized with `initialize.sql`
+- **Redis 7.4** on port `6379`
+
+```bash
+# Start
+docker-compose up -d
+
+# Stop
+docker-compose down
+```
+
+---
+
+## 🗺️ Roadmap
+
+- [ ] **Unit and integration tests** — cover services, controllers and security filters with JUnit 5 and MockK
+- [ ] **Cache annotations** — apply `@Cacheable` and `@CacheEvict` on read endpoints (currently Redis is configured but unused)
+- [ ] **Task status field** — add `status` with values like `TODO`, `IN_PROGRESS`, `DONE`
+- [ ] **Swagger / OpenAPI** — interactive API docs via SpringDoc
+- [ ] **Flyway migrations** — replace `ddl-auto: update` with versioned schema management
+
+---
+
+## 📐 Response format
+
+All endpoints return the same envelope:
+
+```json
+{
+  "body": {},
+  "message": "Descriptive message",
+  "statusCode": 200
+}
+```
